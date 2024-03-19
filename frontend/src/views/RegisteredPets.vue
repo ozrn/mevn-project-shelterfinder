@@ -3,10 +3,11 @@
     <div class='columns is-mobile is-centered'>
       <div class='column is-8'>
         <div>
-          <h2>List of the registered pets</h2>
+          <h1 v-show='isLoading'>It might take some time</h1>
+          <h2 v-show='!isLoading'>List of the registered pets</h2>
           <hr />
         </div>
-        <table
+        <table v-if='!isLoading && survivors.length'
           class='table is-bordered is-striped is-narrow is-hoverable is-fullwidth'
         >
           <thead class='table-head'>
@@ -26,18 +27,28 @@
         </table>
       </div>
     </div>
+    <Loading :active='isLoading' loader='dots'></Loading>
   </div>
 </template>
 
 <script>
 import SurvivorCard from '../components/survivor-card.vue'
 import { mapState, mapActions } from 'vuex'
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/css/index.css'
 
 export default {
   name: 'RegisteredPets',
 
+  data() {
+    return {
+      isLoading: true
+    }
+  },
+
   components: {
-    SurvivorCard
+    SurvivorCard,
+    Loading
   },
 
   computed: {
@@ -49,12 +60,19 @@ export default {
   },
 
   created() {
-    this.fetchSurvivors()
+    this.fetchSurvivors().then(()=> {
+      this.isLoading=false
+    })
   }
 }
 </script>
 
 <style scoped>
+h1 {
+  font-weight: 700;
+  font-style: italic;
+}
+
 h2 {
   margin: 2rem;
   font-weight: 700;
